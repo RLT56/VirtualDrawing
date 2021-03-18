@@ -6,9 +6,13 @@
 #include <iostream>
 #include <stdio.h>
 #include "utils.h"
+#include "Drawing.h"
 
 using namespace cv;
 using namespace std;
+extern int H_MIN, H_MAX, S_MIN, S_MAX, V_MIN, V_MAX, FINISHED;
+extern const int FRAME_WIDTH, FRAME_HEIGHT, MAX_NUM_OBJECTS, MIN_OBJECT_AREA, MAX_OBJECT_AREA;
+extern const string windowName, windowName1, windowName2, windowName3, trackbarWindowName;
 
 void on_trackbar(int, void*)
 {}
@@ -18,7 +22,7 @@ string intToString(int number){
 	return ss.str();
 }
 
-void createTrackbars(int &H_MIN, int &H_MAX, int &S_MIN, int &S_MAX, int &V_MIN, int &V_MAX, int &FINISHED) {
+void createTrackbars() {
 	//create window for trackbars
 
 
@@ -62,39 +66,36 @@ void askMenu(int &H_MIN, int &H_MAX, int &S_MIN, int &S_MAX, int &V_MIN, int &V_
   cin>>V_MAX;
 }
 
-
-
-
-
-/*class HSV
+void calibrate(VideoCapture capture, Mat cameraFeed, Mat HSV, Mat threshold, int x, int y, bool trackObjects, bool useMorphOps)
 {
-    int H_MIN; 
-    int H_MAX; 
-    int S_MIN;
-    int S_MAX; 
-    int V_MIN;
-    int V_MAX;
-    int FINISHED;
+    while(1){
+   		//store image to matrix
+		capture.read(cameraFeed);
+		//convert frame from BGR to HSV colorspace
+		cvtColor(cameraFeed, HSV, COLOR_BGR2HSV);
+		//filter HSV image between values and store filtered image to
+		//threshold matrix
+		inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+		//perform morphological operations on thresholded image to eliminate noise
+		//and emphasize the filtered object(s)
+		if (useMorphOps)
+			morphOps(threshold);
+		//pass in thresholded frame to our object tracking function
+		//this function will return the x and y coordinates of the
+		//filtered object
+		if (trackObjects)
+			trackFilteredObject(x, y, threshold, cameraFeed);
 
-    public:
+		//show frames 
+		imshow(windowName2, threshold);
+		imshow(windowName, cameraFeed);
+		imshow(windowName1, HSV);
 
-    HSV(int H_MIN, int H_MAX, int S_MIN, int S_MAX, int V_MIN, int V_MAX, bool FINISHED)
-    {
-        this->H_MIN = H_MIN;
-        this->H_MAX = H_MAX;
-        this->S_MIN = S_MIN;
-        this->S_MAX = S_MAX;
-        this->V_MIN = V_MIN;
-        this->V_MAX = V_MAX;
+		//delay 30ms so that screen can refresh.
+		//image will not appear without this waitKey() command
+		waitKey(30);
+		if (FINISHED) {cv::destroyWindow(windowName1);
+					   cv::destroyWindow(windowName2);
+			           break;}}
 
-    }
-
-    int get_HMIN() {return H_MIN;}
-    int get_HMAX(){return H_MAX;}
-    int get_SMIN(){return S_MIN;}
-    int get_SMAX(){return S_MAX;}
-    int get_VMIN(){return V_MIN;}
-    int get_VMAX(){return V_MAX;}
-
-
-};*/
+}
