@@ -11,9 +11,10 @@ extern const int FRAME_WIDTH, FRAME_HEIGHT, MAX_NUM_OBJECTS, MIN_OBJECT_AREA, MA
 extern const string windowName, windowName1, windowName2, windowName3, trackbarWindowName;
 
 void drawObject(int x, int y, cv::Mat& frame);
-
+void drawObject(int x, int y, cv::Mat& frame, cv::Mat& draw);
 void morphOps(cv::Mat& thresh);
 
-void trackFilteredObject(int& x, int& y, cv::Mat threshold, cv::Mat& cameraFeed);
+void trackFilteredObject(int& x, int& y, cv::Mat& threshold, cv::Mat& cameraFeed, cv::Mat& draw);
 
-int drawPoints(VideoCapture capture, Mat& cameraFeed, Mat& HSV, Mat& threshold, Mat& draw, int x, int y);
+
+int drawPoints(cv::VideoCapture& capture, cv::Mat& cameraFeed, cv::Mat& HSV, cv::Mat& threshold, cv::Mat& draw, int x, int y);
